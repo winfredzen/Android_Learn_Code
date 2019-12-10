@@ -3,7 +3,11 @@ package com.example.criminalintent;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -36,12 +40,16 @@ public class CrimeFragment extends Fragment {
 
     private CheckBox mSolvedCheckBox;
 
+    private Button mReportButton; //报告按钮
+    private Button mSuspectButton;
+
     private static final String ARG_CRIME_ID = "crime_id";
 
     private static final String DIALOG_DATE = "DialogDate";
 
     //请求码
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_CONTACT = 1;//请求联系人
 
     //构造方法
     public static CrimeFragment newInstance(UUID crimeId) {
@@ -68,7 +76,7 @@ public class CrimeFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_crime, container, false);
 
@@ -126,6 +134,43 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        //报告
+        mReportButton = (Button) view.findViewById(R.id.crime_report);
+        mReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, getCrimeReport());//消息内容
+                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));//消息主题
+                intent = Intent.createChooser(intent, getString(R.string.send_report));
+                startActivity(intent);
+
+            }
+        });
+
+        //嫌疑人
+        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        mSuspectButton = (Button) view.findViewById(R.id.crime_suspect);
+        mSuspectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivityForResult(pickContact, REQUEST_CONTACT);
+
+            }
+        });
+
+        if (mCrime.getSuspect() != null) {
+            mSuspectButton.setText(mCrime.getSuspect());
+        }
+
+        //检查是否存在联系人应用
+        PackageManager packageManager = getActivity().getPackageManager();
+        if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
+            mSuspectButton.setEnabled(false); //禁用
+        }
 
         return view;
 
@@ -151,6 +196,33 @@ public class CrimeFragment extends Fragment {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
             updateDate();
+        }
+
+        if (requestCode == REQUEST_CONTACT && data != null) {//联系人
+            Uri contactUri = data.getData();
+
+            String[] queryFields = new String[] {
+                ContactsContract.Contacts.DISPLAY_NAME
+            };
+            Cursor c = getActivity().getContentResolver().query(contactUri, queryFields, null, null, null);
+
+            try {
+
+                if (c.getCount() == 0) {
+                    return;
+                }
+                c.moveToFirst();
+                String suspect = c.getString(0);
+                mCrime.setSuspect(suspect);
+                mSuspectButton.setText(suspect);
+
+
+            } finally {
+
+                c.close();
+
+            }
+
         }
     }
 
