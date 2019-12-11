@@ -4,14 +4,19 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -23,11 +28,16 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.example.criminalintent.mode.Crime;
 import com.example.criminalintent.mode.CrimeLab;
+import com.example.criminalintent.mode.PictureUtils;
 
+import java.io.File;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class CrimeFragment extends Fragment {
@@ -43,6 +53,10 @@ public class CrimeFragment extends Fragment {
     private Button mReportButton; //报告按钮
     private Button mSuspectButton;
 
+    private ImageButton mPhotoButton;
+    private File mPhotoFile;
+    private ImageView mPhotoView;
+
     private static final String ARG_CRIME_ID = "crime_id";
 
     private static final String DIALOG_DATE = "DialogDate";
@@ -50,6 +64,7 @@ public class CrimeFragment extends Fragment {
     //请求码
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;//请求联系人
+    private static final int REQUEST_PHOTO= 2;
 
     //构造方法
     public static CrimeFragment newInstance(UUID crimeId) {
@@ -71,6 +86,9 @@ public class CrimeFragment extends Fragment {
         UUID uuid = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
 
         mCrime = CrimeLab.get(getActivity()).getCrime(uuid);
+
+        //获取照片文件位置
+        mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime);
 
     }
 
@@ -172,6 +190,34 @@ public class CrimeFragment extends Fragment {
             mSuspectButton.setEnabled(false); //禁用
         }
 
+
+        mPhotoButton = (ImageButton) view.findViewById(R.id.crime_camera);
+        mPhotoView = (ImageView) view.findViewById(R.id.crime_photo);
+        //拍照
+        final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        boolean canTakePhoto = mPhotoFile != null && captureImage.resolveActivity(packageManager) != null;
+        mPhotoButton.setEnabled(canTakePhoto);
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Uri uri = FileProvider.getUriForFile(getActivity(),"com.bignerdranch.android.criminalintent.fileprovider", mPhotoFile); captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                List<ResolveInfo> cameraActivities = getActivity() .getPackageManager().queryIntentActivities(captureImage, PackageManager.MATCH_DEFAULT_ONLY);
+
+                for (ResolveInfo activity : cameraActivities) {
+
+                    getActivity().grantUriPermission(activity.activityInfo.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+                }
+
+                startActivityForResult(captureImage, REQUEST_PHOTO);
+
+
+            }
+        });
+
+        updatePhotoView();
+
         return view;
 
     }
@@ -224,6 +270,14 @@ public class CrimeFragment extends Fragment {
             }
 
         }
+
+        if (requestCode == REQUEST_PHOTO && data != null) {
+
+            Uri uri = FileProvider.getUriForFile(getActivity(), "com.bignerdranch.android.criminalintent.fileprovider", mPhotoFile);
+            getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            updatePhotoView();
+
+        }
     }
 
 
@@ -250,5 +304,15 @@ public class CrimeFragment extends Fragment {
         }
         String report = getString(R.string.crime_report, mCrime.getTitle(), dateString, solvedString, suspect);
         return report;
+    }
+
+    //更新mPhotoView
+    private void updatePhotoView() {
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            mPhotoView.setImageDrawable(null); }
+        else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap( mPhotoFile.getPath(), getActivity());
+            mPhotoView.setImageBitmap(bitmap);
+        }
     }
 }

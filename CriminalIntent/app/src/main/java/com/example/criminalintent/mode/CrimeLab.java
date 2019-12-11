@@ -9,6 +9,7 @@ import com.example.criminalintent.database.CrimeBaseHelper;
 import com.example.criminalintent.database.CrimeCursorWrapper;
 import com.example.criminalintent.database.CrimeDbSchema;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,11 @@ public class CrimeLab {
             sCrimeLab = new CrimeLab(context);
         }
         return sCrimeLab;
+    }
+
+    public File getPhotoFile(Crime crime) {
+        File filesDir = mContext.getFilesDir();
+        return new File(filesDir, crime.getPhotoFilename());
     }
 
     //将Crime记录转换为ContentValues
