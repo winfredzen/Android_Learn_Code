@@ -1,13 +1,11 @@
 package com.example.criminalintent;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -60,6 +58,8 @@ public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
 
     private static final String DIALOG_DATE = "DialogDate";
+
+    private static final String DIALOG_IMG = "DialogImageView";
 
     //请求码
     private static final int REQUEST_DATE = 0;
@@ -201,7 +201,15 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Uri uri = FileProvider.getUriForFile(getActivity(),"com.bignerdranch.android.criminalintent.fileprovider", mPhotoFile); captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                /*
+                调用FileProvider.getUriForFile(...)会把本地文件路径转换为相机能看见的Uri形 式。
+                要实际写入文件，还需要给相机应用权限。
+                为了授权，我们授予FLAG_GRANT_WRITE_URI_ PERMISSION给所有cameraImage intent的目标activity，以此允许它们在Uri指定的位置写文件。
+                当然，还有个前提条件:在声明FileProvider的时候添加过android:grantUriPermissions属性
+                 */
+
+                Uri uri = FileProvider.getUriForFile(getActivity(),"com.bignerdranch.android.criminalintent.fileprovider", mPhotoFile);
+                captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
                 List<ResolveInfo> cameraActivities = getActivity() .getPackageManager().queryIntentActivities(captureImage, PackageManager.MATCH_DEFAULT_ONLY);
 
                 for (ResolveInfo activity : cameraActivities) {
@@ -217,6 +225,19 @@ public class CrimeFragment extends Fragment {
         });
 
         updatePhotoView();
+
+        //mPhotoView点击
+        mPhotoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //展示弹窗
+                FragmentManager manager = getFragmentManager();
+                ImageViewDialogFragment dialog = ImageViewDialogFragment.newInstance(mPhotoFile);
+                dialog.show(manager, DIALOG_IMG);
+
+            }
+        });
 
         return view;
 
@@ -271,7 +292,7 @@ public class CrimeFragment extends Fragment {
 
         }
 
-        if (requestCode == REQUEST_PHOTO && data != null) {
+        if (requestCode == REQUEST_PHOTO) {
 
             Uri uri = FileProvider.getUriForFile(getActivity(), "com.bignerdranch.android.criminalintent.fileprovider", mPhotoFile);
             getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
