@@ -1,6 +1,7 @@
 package com.example.criminalintent;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -66,6 +67,8 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_CONTACT = 1;//请求联系人
     private static final int REQUEST_PHOTO= 2;
 
+    private Callbacks mCallbacks;
+
     //构造方法
     public static CrimeFragment newInstance(UUID crimeId) {
 
@@ -77,6 +80,21 @@ public class CrimeFragment extends Fragment {
 
         return fragment;
 
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        mCallbacks = (Callbacks) context;
+    }
+
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        mCallbacks = null;
     }
 
     @Override
@@ -113,6 +131,8 @@ public class CrimeFragment extends Fragment {
 
                 mCrime.setTitle(s.toString());
 
+                updateCrime();//更新crime
+
             }
 
             @Override
@@ -148,6 +168,8 @@ public class CrimeFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 mCrime.setSolved(isChecked);
+
+                updateCrime();//更新crime
 
             }
         });
@@ -262,6 +284,8 @@ public class CrimeFragment extends Fragment {
             //重新设置时间
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
+
+            updateCrime();//更新crime
             updateDate();
         }
 
@@ -281,6 +305,8 @@ public class CrimeFragment extends Fragment {
                 c.moveToFirst();
                 String suspect = c.getString(0);
                 mCrime.setSuspect(suspect);
+
+                updateCrime();//更新crime
                 mSuspectButton.setText(suspect);
 
 
@@ -296,11 +322,18 @@ public class CrimeFragment extends Fragment {
 
             Uri uri = FileProvider.getUriForFile(getActivity(), "com.bignerdranch.android.criminalintent.fileprovider", mPhotoFile);
             getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+            updateCrime();//更新crime
             updatePhotoView();
 
         }
     }
 
+
+    private void updateCrime() {
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+        mCallbacks.onCrimeUpdated(mCrime);
+    }
 
     //更新日期
     private void updateDate() {
@@ -336,4 +369,11 @@ public class CrimeFragment extends Fragment {
             mPhotoView.setImageBitmap(bitmap);
         }
     }
+
+    //定义接口，更新回到
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
+    }
+
+
 }
