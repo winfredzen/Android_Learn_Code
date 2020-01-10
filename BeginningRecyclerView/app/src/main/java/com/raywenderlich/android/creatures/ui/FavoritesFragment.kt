@@ -32,13 +32,20 @@ package com.raywenderlich.android.creatures.ui
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.raywenderlich.android.creatures.R
+import com.raywenderlich.android.creatures.model.CreatureStore
+import com.raywenderlich.android.creatures.model.Favorites
+import kotlinx.android.synthetic.main.fragment_all.*
+import kotlinx.android.synthetic.main.fragment_favorites.*
 
 
 class FavoritesFragment : Fragment() {
+
+  private val adpater = CreatureAdpater(mutableListOf())
 
   companion object {
     fun newInstance(): FavoritesFragment {
@@ -49,4 +56,23 @@ class FavoritesFragment : Fragment() {
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     return inflater.inflate(R.layout.fragment_favorites, container, false)
   }
+
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    favoritesRecyclerView.layoutManager = LinearLayoutManager(activity)
+    favoritesRecyclerView.adapter = adpater
+  }
+
+  override fun onResume() {
+    super.onResume()
+
+    val favorites = CreatureStore.getFavoriteCreatures(activity!!)
+    favorites?.let {
+      adpater.updateCreatures(favorites)
+    }
+
+  }
+
 }

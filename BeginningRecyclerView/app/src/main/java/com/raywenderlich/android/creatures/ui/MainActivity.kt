@@ -32,9 +32,11 @@ package com.raywenderlich.android.creatures.ui
 
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 import com.raywenderlich.android.creatures.R
 import kotlinx.android.synthetic.main.activity_main.*
 
