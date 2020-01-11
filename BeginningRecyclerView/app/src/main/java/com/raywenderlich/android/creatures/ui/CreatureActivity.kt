@@ -33,6 +33,7 @@ package com.raywenderlich.android.creatures.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -121,6 +122,9 @@ class CreatureActivity : AppCompatActivity() {
 
     foodRecyclerView.layoutManager = GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false)
     foodRecyclerView.adapter = adpater
+
+    val dividerWidthInPixels = resources.getDimensionPixelSize(R.dimen.list_item_divider_height)
+    foodRecyclerView.addItemDecoration(FoodItemDecoration(ContextCompat.getColor(this, R.color.black), dividerWidthInPixels))
 
     val foods = CreatureStore.getCreatureFoods(creature)
     adpater.updateFoods(foods)
