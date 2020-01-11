@@ -12,9 +12,6 @@ import android.view.ViewGroup
 import com.raywenderlich.android.creatures.R
 import com.raywenderlich.android.creatures.app.inflate
 import com.raywenderlich.android.creatures.model.Creature
-import kotlinx.android.synthetic.main.list_item_creature.view.*
-import kotlinx.android.synthetic.main.list_item_creature.view.creatureImage
-import kotlinx.android.synthetic.main.list_item_creature.view.nickName
 import kotlinx.android.synthetic.main.list_item_creature_card.view.*
 
 class CreatureCardAdpater(private val creatures: MutableList<Creature>) : RecyclerView.Adapter<CreatureCardAdpater.ViewHolder>() {
@@ -53,7 +50,7 @@ class CreatureCardAdpater(private val creatures: MutableList<Creature>) : Recycl
             val context = itemView.context
             val imageResource = context.resources.getIdentifier(creature.uri, null, context.packageName)
             itemView.creatureImage.setImageResource(imageResource)
-            itemView.nickName.text = creature.nickname
+            itemView.fullName.text = creature.fullName
 
             setBackgroundColors(context, imageResource)
         }
@@ -69,10 +66,10 @@ class CreatureCardAdpater(private val creatures: MutableList<Creature>) : Recycl
             val image = BitmapFactory.decodeResource(context.resources, imageResource)
             Palette.from(image).generate { palette ->  
                 val backgroundColor = palette.getDominantColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))
-                itemView.creatureCard.setBackgroundColor(backgroundColor)
-                itemView.nicknameHolder.setBackgroundColor(backgroundColor)
+                itemView.creatureCardContainer.setBackgroundColor(backgroundColor)
+                itemView.fullName.setBackgroundColor(backgroundColor)
                 val textColor = if (isColorDark(backgroundColor)) Color.WHITE else Color.BLACK
-                itemView.nickName.setTextColor(textColor)
+                itemView.fullName.setTextColor(textColor)
             }
         }
 
