@@ -34,6 +34,8 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,9 +46,13 @@ import kotlinx.android.synthetic.main.fragment_all.*
 import kotlinx.android.synthetic.main.fragment_favorites.*
 
 
-class FavoritesFragment : Fragment() {
+class FavoritesFragment : Fragment(), ItemDragListener {
 
-  private val adpater = CreatureAdpater(mutableListOf())
+//  private val adpater = CreatureAdpater(mutableListOf())
+
+  private val adpater = CreatureAdpaterNoHeader(mutableListOf(), this)
+
+  private lateinit var itemTouchHelper: ItemTouchHelper
 
   companion object {
     fun newInstance(): FavoritesFragment {
@@ -65,6 +71,8 @@ class FavoritesFragment : Fragment() {
     favoritesRecyclerView.layoutManager = LinearLayoutManager(activity)
     favoritesRecyclerView.adapter = adpater
 
+    setupItemTouchHelper()
+
     val heightInPixels = resources.getDimensionPixelSize(R.dimen.list_item_divider_height)
     favoritesRecyclerView.addItemDecoration(DividerItemDecoration(ContextCompat.getColor(context!!, R.color.black), heightInPixels))
 
@@ -73,10 +81,26 @@ class FavoritesFragment : Fragment() {
   override fun onResume() {
     super.onResume()
 
-    val composites = CreatureStore.getFavoriteComposites(activity!!)
-    composites?.let {
-      adpater.updateCreatures(composites)
+//    val composites = CreatureStore.getFavoriteComposites(activity!!)
+//    composites?.let {
+//      adpater.updateCreatures(composites)
+//    }
+
+    val creatures = CreatureStore.getFavoriteCreatures(activity!!)
+    creatures?.let {
+      adpater.updateCreatures(creatures)
     }
+
+  }
+
+  private fun setupItemTouchHelper() {
+    itemTouchHelper = ItemTouchHelper(ItemTouchHelperCallback(adpater))
+    itemTouchHelper.attachToRecyclerView(favoritesRecyclerView)
+  }
+
+  override fun onItemDrag(viewHolder: RecyclerView.ViewHolder) {
+
+    itemTouchHelper.startDrag(viewHolder)
 
   }
 
