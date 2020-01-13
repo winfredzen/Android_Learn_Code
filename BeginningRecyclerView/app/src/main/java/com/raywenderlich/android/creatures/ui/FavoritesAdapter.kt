@@ -10,17 +10,17 @@ import com.raywenderlich.android.creatures.app.inflate
 import com.raywenderlich.android.creatures.model.Creature
 import kotlinx.android.synthetic.main.list_item_creature.view.*
 
-class FavoritesAdapter(private val creatures: List<Creature>): RecyclerView.Adapter<CreatureAdpater.ViewHolder>() {
+class FavoritesAdapter(private val creatures: List<Creature>): RecyclerView.Adapter<FavoritesAdapter.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CreatureAdpater.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoritesAdapter.ViewHolder {
 
-        return CreatureAdpater.ViewHolder(parent.inflate(R.layout.list_item_creature, false))
+        return FavoritesAdapter.ViewHolder(parent.inflate(R.layout.list_item_creature, false))
 
     }
 
     override fun getItemCount() = creatures.size
 
-    override fun onBindViewHolder(holder: CreatureAdpater.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FavoritesAdapter.ViewHolder, position: Int) {
 
         holder.bind(creatures[position])
 

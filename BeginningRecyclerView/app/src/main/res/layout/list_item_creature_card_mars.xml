@@ -40,7 +40,7 @@
             android:layout_gravity="bottom"
             android:background="@color/colorAccent"
             android:alpha="0.9"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             >
 
             <TextView
@@ -55,6 +55,18 @@
                 android:textColor="@android:color/white"
                 android:maxLines="3"
                 android:textSize="@dimen/creature_card_text_size"/>
+
+            <TextView
+                android:id="@+id/slogan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_horizontal"
+                android:padding="@dimen/padding_half"
+                android:text="@string/mars_slogan"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/creature_card_slogan_size"
+                android:textStyle="bold" />
 
 
 

@@ -7,10 +7,13 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import com.raywenderlich.android.creatures.R
 import com.raywenderlich.android.creatures.app.inflate
+import com.raywenderlich.android.creatures.model.CompositeItem
 import com.raywenderlich.android.creatures.model.Creature
 import kotlinx.android.synthetic.main.list_item_creature.view.*
+import kotlinx.android.synthetic.main.list_item_planet_header.view.*
+import java.lang.IllegalArgumentException
 
-class CreatureAdpater(private val creatures: MutableList<Creature>) : RecyclerView.Adapter<CreatureAdpater.ViewHolder>() {
+class CreatureAdpater(private val compositeItems: MutableList<CompositeItem>) : RecyclerView.Adapter<CreatureAdpater.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
@@ -20,20 +23,36 @@ class CreatureAdpater(private val creatures: MutableList<Creature>) : RecyclerVi
             return LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
         }
          */
-        return ViewHolder(parent.inflate(R.layout.list_item_creature))
+//        return ViewHolder(parent.inflate(R.layout.list_item_creature))
+
+        return when(viewType) {
+
+            ViewType.CREATURE.ordinal -> ViewHolder(parent.inflate(R.layout.list_item_creature))
+            ViewType.HEADER.ordinal -> ViewHolder(parent.inflate(R.layout.list_item_planet_header))
+            else -> throw IllegalArgumentException()
+
+        }
 
     }
 
-    override fun getItemCount() = creatures.size
+    override fun getItemCount() = compositeItems.size
+
+    override fun getItemViewType(position: Int): Int {
+        if (compositeItems[position].isHeader) {
+            return ViewType.HEADER.ordinal
+        } else {
+            return ViewType.CREATURE.ordinal
+        }
+    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         //在这里ViewHolder绑定数据
-        holder.bind(creatures[position])
+        holder.bind(compositeItems[position])
     }
 
-    fun updateCreatures(creatures: List<Creature>) {
-        this.creatures.clear()
-        this.creatures.addAll(creatures)
+    fun updateCreatures(creatures: List<CompositeItem>) {
+        this.compositeItems.clear()
+        this.compositeItems.addAll(creatures)
         notifyDataSetChanged()
     }
 
@@ -47,18 +66,25 @@ class CreatureAdpater(private val creatures: MutableList<Creature>) : RecyclerVi
         }
 
         //绑定数据
-        fun bind(creature: Creature) {
-            this.creature = creature
-            val context = itemView.context
-            //itemView.creatureImage.setImageResource(context.resources.getIdentifier(creature.uri, null, context.packageName))
-            val resId = context.resources.getIdentifier(creature.uri, null, context.packageName)
-            var drawable = context.getDrawable(resId)
-            itemView.creatureImage.setImageDrawable(drawable)
-            itemView.fullName.text = creature.fullName
+        fun bind(compositeItem: CompositeItem) {
 
-            itemView.nickName.text = creature.nickname
+            if (compositeItem.isHeader) {
+                itemView.headerName.text = compositeItem.header.name
+            } else {
 
-            animationView(itemView)
+                this.creature = compositeItem.creature
+                val context = itemView.context
+                //itemView.creatureImage.setImageResource(context.resources.getIdentifier(creature.uri, null, context.packageName))
+                val resId = context.resources.getIdentifier(creature.uri, null, context.packageName)
+                var drawable = context.getDrawable(resId)
+                itemView.creatureImage.setImageDrawable(drawable)
+                itemView.fullName.text = creature.fullName
+
+                itemView.nickName.text = creature.nickname
+                animationView(itemView)
+
+            }
+
         }
 
         //实现点击事件方法
@@ -75,6 +101,10 @@ class CreatureAdpater(private val creatures: MutableList<Creature>) : RecyclerVi
             }
         }
 
+    }
+
+    enum class ViewType {
+        HEADER, CREATURE
     }
 
 }

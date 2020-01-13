@@ -12,26 +12,40 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import com.raywenderlich.android.creatures.R
 import com.raywenderlich.android.creatures.app.inflate
+import com.raywenderlich.android.creatures.model.Constants
 import com.raywenderlich.android.creatures.model.Creature
-import kotlinx.android.synthetic.main.list_item_creature_card.view.*
+import kotlinx.android.synthetic.main.list_item_creature_card_jupiter.view.*
+
 
 class CreatureCardAdpater(private val creatures: MutableList<Creature>) : RecyclerView.Adapter<CreatureCardAdpater.ViewHolder>() {
 
     var scrollDirection = ScrollDirection.DOWN
+    var jupiterSpanSize = 2
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-
-        //创建ViewHolder，这是使用的是ViewGroup上的一个扩展方法
-        /*
-        fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToRoot: Boolean = false): View {
-            return LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
+        return when (viewType) {
+            ViewType.OTHER.ordinal -> ViewHolder(parent.inflate(R.layout.list_item_creature_card))
+            ViewType.MARS.ordinal -> ViewHolder(parent.inflate(R.layout.list_item_creature_card_mars))
+            ViewType.JUPITER.ordinal -> ViewHolder(parent.inflate(R.layout.list_item_creature_card_jupiter))
+            else -> throw IllegalArgumentException("Illegal value for viewType")
         }
-         */
-        return ViewHolder(parent.inflate(R.layout.list_item_creature_card))
-
     }
 
     override fun getItemCount() = creatures.size
+
+    override fun getItemViewType(position: Int) = when(creatures[position].planet) {
+        Constants.JUPITER -> ViewType.JUPITER.ordinal
+        Constants.MARS -> ViewType.MARS.ordinal
+        else -> ViewType.OTHER.ordinal
+    }
+
+    fun spanSizeAtPosition(position: Int): Int {
+        return if (creatures[position].planet == Constants.JUPITER) {
+            jupiterSpanSize
+        } else {
+            1
+        }
+    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         //在这里ViewHolder绑定数据
@@ -71,10 +85,13 @@ class CreatureCardAdpater(private val creatures: MutableList<Creature>) : Recycl
             val image = BitmapFactory.decodeResource(context.resources, imageResource)
             Palette.from(image).generate { palette ->  
                 val backgroundColor = palette.getDominantColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))
-                itemView.creatureCardContainer.setBackgroundColor(backgroundColor)
-                itemView.fullName.setBackgroundColor(backgroundColor)
+                itemView.creatureCard.setBackgroundColor(backgroundColor)
+                itemView.nameHolder.setBackgroundColor(backgroundColor)
                 val textColor = if (isColorDark(backgroundColor)) Color.WHITE else Color.BLACK
                 itemView.fullName.setTextColor(textColor)
+                if (itemView.slogan != null) {
+                    itemView.slogan.setTextColor(textColor)
+                }
             }
         }
 
@@ -97,6 +114,10 @@ class CreatureCardAdpater(private val creatures: MutableList<Creature>) : Recycl
     //滚动的方向
     enum class ScrollDirection {
         UP, DOWN
+    }
+
+    enum class ViewType {
+        JUPITER, MARS, OTHER
     }
 
 }

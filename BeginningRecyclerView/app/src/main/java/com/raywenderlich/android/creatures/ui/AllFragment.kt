@@ -50,7 +50,7 @@ class AllFragment : Fragment() {
 //  private val adpater = CreatureWithFoodAdpater(CreatureStore.getCreatures().toMutableList())
     private val adpater = CreatureCardAdpater(CreatureStore.getCreatures().toMutableList())
 
-    private lateinit var layoutManager: StaggeredGridLayoutManager
+    private lateinit var layoutManager: GridLayoutManager
 
     private enum class GridState {
         LIST, GRID
@@ -146,7 +146,12 @@ class AllFragment : Fragment() {
 //    creatureRecyclerView.layoutManager = layoutManager
 //    creatureRecyclerView.adapter = adpater
 
-        layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        layoutManager = GridLayoutManager(context,2, GridLayoutManager.VERTICAL, false)
+        layoutManager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {//获取spansize
+            override fun getSpanSize(position: Int): Int {
+                return adpater.spanSizeAtPosition(position)
+            }
+        }
         creatureRecyclerView.layoutManager = layoutManager
         creatureRecyclerView.adapter = adpater
 
@@ -176,6 +181,7 @@ class AllFragment : Fragment() {
     private fun updateRecyclerView(spanCount: Int, addItemDecoration: RecyclerView.ItemDecoration, removeItemDecoration: RecyclerView.ItemDecoration) {
 
         layoutManager.spanCount = spanCount
+        adpater.jupiterSpanSize = spanCount
         creatureRecyclerView.removeItemDecoration(removeItemDecoration)
         creatureRecyclerView.addItemDecoration(addItemDecoration)
 
