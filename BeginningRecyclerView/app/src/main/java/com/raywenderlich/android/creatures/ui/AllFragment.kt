@@ -36,6 +36,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import com.raywenderlich.android.creatures.R
@@ -154,6 +155,21 @@ class AllFragment : Fragment() {
         gridItemDecoration = SpacingItemDecoration(2, spacingInPixels)
 
         creatureRecyclerView.addItemDecoration(gridItemDecoration)
+
+        //滚动监听
+        creatureRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                Log.d("Scroll", dy.toString())
+
+                adpater.scrollDirection = if (dy > 0) {
+                    CreatureCardAdpater.ScrollDirection.DOWN
+                } else {
+                    CreatureCardAdpater.ScrollDirection.UP
+                }
+            }
+        })
 
     }
 

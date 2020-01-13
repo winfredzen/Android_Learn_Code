@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import com.raywenderlich.android.creatures.R
 import com.raywenderlich.android.creatures.app.inflate
 import com.raywenderlich.android.creatures.model.Creature
@@ -56,6 +57,8 @@ class CreatureAdpater(private val creatures: MutableList<Creature>) : RecyclerVi
             itemView.fullName.text = creature.fullName
 
             itemView.nickName.text = creature.nickname
+
+            animationView(itemView)
         }
 
         //实现点击事件方法
@@ -63,6 +66,13 @@ class CreatureAdpater(private val creatures: MutableList<Creature>) : RecyclerVi
             val context = view.context
             val intent = CreatureActivity.newIntent(context, creature.id)
             context.startActivity(intent)
+        }
+
+        private fun animationView(viewToAnimation: View) {
+            if (viewToAnimation.animation == null) {
+                val animation = AnimationUtils.loadAnimation(viewToAnimation.context, R.anim.scale_xy)
+                viewToAnimation.animation = animation
+            }
         }
 
     }

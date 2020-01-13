@@ -9,12 +9,15 @@ import android.support.v7.graphics.Palette
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import com.raywenderlich.android.creatures.R
 import com.raywenderlich.android.creatures.app.inflate
 import com.raywenderlich.android.creatures.model.Creature
 import kotlinx.android.synthetic.main.list_item_creature_card.view.*
 
 class CreatureCardAdpater(private val creatures: MutableList<Creature>) : RecyclerView.Adapter<CreatureCardAdpater.ViewHolder>() {
+
+    var scrollDirection = ScrollDirection.DOWN
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
@@ -35,7 +38,7 @@ class CreatureCardAdpater(private val creatures: MutableList<Creature>) : Recycl
         holder.bind(creatures[position])
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
         private lateinit var creature: Creature
 
@@ -53,6 +56,8 @@ class CreatureCardAdpater(private val creatures: MutableList<Creature>) : Recycl
             itemView.fullName.text = creature.fullName
 
             setBackgroundColors(context, imageResource)
+
+            animationView(itemView)
         }
 
         //实现点击事件方法
@@ -78,6 +83,20 @@ class CreatureCardAdpater(private val creatures: MutableList<Creature>) : Recycl
             return darkness >= 0.5
         }
 
+        //动画
+        private fun animationView(viewToaAnimation: View) {
+            if (viewToaAnimation.animation == null) {
+                val animId = if (scrollDirection == ScrollDirection.DOWN) R.anim.slide_from_bottom else R.anim.slide_from_top
+                val animation = AnimationUtils.loadAnimation(viewToaAnimation.context, animId)
+                viewToaAnimation.animation = animation
+            }
+        }
+
+    }
+
+    //滚动的方向
+    enum class ScrollDirection {
+        UP, DOWN
     }
 
 }
