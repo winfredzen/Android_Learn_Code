@@ -14,10 +14,12 @@ import com.raywenderlich.android.creatures.R
 import com.raywenderlich.android.creatures.app.inflate
 import com.raywenderlich.android.creatures.model.Constants
 import com.raywenderlich.android.creatures.model.Creature
+import com.raywenderlich.android.creatures.model.Favorites
 import kotlinx.android.synthetic.main.list_item_creature_card_jupiter.view.*
+import java.util.*
 
 
-class CreatureCardAdpater(private val creatures: MutableList<Creature>) : RecyclerView.Adapter<CreatureCardAdpater.ViewHolder>() {
+class CreatureCardAdpater(private val creatures: MutableList<Creature>) : RecyclerView.Adapter<CreatureCardAdpater.ViewHolder>(), ItemTouchHelperListener {
 
     var scrollDirection = ScrollDirection.DOWN
     var jupiterSpanSize = 2
@@ -109,6 +111,23 @@ class CreatureCardAdpater(private val creatures: MutableList<Creature>) : Recycl
             }
         }
 
+    }
+
+    //拖动回调
+    override fun onItemMove(recyclerView: RecyclerView, fromPosition: Int, toPosition: Int): Boolean {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                Collections.swap(creatures, i, i + 1)
+            }
+
+        } else {
+            for (i in fromPosition downTo  toPosition + 1) {
+                Collections.swap(creatures, i, i - 1)
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition)
+
+        return true
     }
 
     //滚动的方向

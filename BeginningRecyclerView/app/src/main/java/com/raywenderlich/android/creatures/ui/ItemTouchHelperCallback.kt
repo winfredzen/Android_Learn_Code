@@ -11,6 +11,7 @@ class ItemTouchHelperCallback(private val listener: ItemTouchHelperListener): It
         return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
     }
 
+    //drag的时候，调用此方法
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
         return listener.onItemMove(recyclerView, viewHolder.adapterPosition, target.adapterPosition)
     }
@@ -21,7 +22,7 @@ class ItemTouchHelperCallback(private val listener: ItemTouchHelperListener): It
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
 
-        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) { //选中，itemView改变颜色
             if (viewHolder is ItemSelectedListener) {
                 viewHolder.onItemSelected()
             }
@@ -34,7 +35,7 @@ class ItemTouchHelperCallback(private val listener: ItemTouchHelperListener): It
     override fun clearView(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?) {
         super.clearView(recyclerView, viewHolder)
 
-        if (viewHolder is ItemSelectedListener) {
+        if (viewHolder is ItemSelectedListener) { //不再选中，清除颜色
             viewHolder.onItemCleared()
         }
     }

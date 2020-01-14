@@ -98,6 +98,7 @@ class FavoritesFragment : Fragment(), ItemDragListener {
     itemTouchHelper.attachToRecyclerView(favoritesRecyclerView)
   }
 
+  //开始拖动
   override fun onItemDrag(viewHolder: RecyclerView.ViewHolder) {
 
     itemTouchHelper.startDrag(viewHolder)

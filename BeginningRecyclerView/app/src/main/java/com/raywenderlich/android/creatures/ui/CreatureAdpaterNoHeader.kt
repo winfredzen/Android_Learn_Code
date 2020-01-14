@@ -19,7 +19,7 @@ import java.lang.IllegalArgumentException
 import java.util.*
 
 class CreatureAdpaterNoHeader(private val creatures: MutableList<Creature>, private val itemDragListener: ItemDragListener) :
-        RecyclerView.Adapter<CreatureAdpaterNoHeader.ViewHolder>(), ItemTouchHelperListener {
+        RecyclerView.Adapter<CreatureAdpaterNoHeader.ViewHolder>(), ItemTouchHelperListener { //ItemTouchHelperListener监听drag FavoritesFragment实现了ItemDragListener
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -48,7 +48,7 @@ class CreatureAdpaterNoHeader(private val creatures: MutableList<Creature>, priv
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, ItemSelectedListener {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, ItemSelectedListener {//ItemSelectedListener监听选中 未选中
 
         private lateinit var creature: Creature
 
@@ -73,9 +73,10 @@ class CreatureAdpaterNoHeader(private val creatures: MutableList<Creature>, priv
             animationView(itemView)
 
 
+            //drag handle
             itemView.handle.setOnTouchListener{_, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
-                    itemDragListener.onItemDrag(this)
+                    itemDragListener.onItemDrag(this) //开始drag了，通知FavoritesFragment的ItemTouchHelper
                 }
                 false
             }
@@ -106,6 +107,7 @@ class CreatureAdpaterNoHeader(private val creatures: MutableList<Creature>, priv
 
     }
 
+    //移动
     override fun onItemMove(recyclerView: RecyclerView, fromPosition: Int, toPosition: Int): Boolean {
         if (fromPosition < toPosition) {
             for (i in fromPosition until toPosition) {

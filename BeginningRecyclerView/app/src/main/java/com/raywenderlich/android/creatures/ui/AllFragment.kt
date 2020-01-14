@@ -36,12 +36,14 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import com.raywenderlich.android.creatures.R
 import com.raywenderlich.android.creatures.model.CreatureStore
 import kotlinx.android.synthetic.main.fragment_all.*
+import kotlinx.android.synthetic.main.fragment_favorites.*
 
 
 class AllFragment : Fragment() {
@@ -51,6 +53,8 @@ class AllFragment : Fragment() {
     private val adpater = CreatureCardAdpater(CreatureStore.getCreatures().toMutableList())
 
     private lateinit var layoutManager: GridLayoutManager
+
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     private enum class GridState {
         LIST, GRID
@@ -146,22 +150,39 @@ class AllFragment : Fragment() {
 //    creatureRecyclerView.layoutManager = layoutManager
 //    creatureRecyclerView.adapter = adpater
 
-        layoutManager = GridLayoutManager(context,2, GridLayoutManager.VERTICAL, false)
-        layoutManager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {//获取spansize
+        setupRecyclerView()
+
+        setupItemDecoration()
+
+        //滚动监听
+        setupScrollListener()
+
+        //设置ItemTouchHelper
+        setupItemTouchHelper()
+
+    }
+
+    private fun setupRecyclerView() {
+        layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            //获取spansize
             override fun getSpanSize(position: Int): Int {
                 return adpater.spanSizeAtPosition(position)
             }
         }
         creatureRecyclerView.layoutManager = layoutManager
         creatureRecyclerView.adapter = adpater
+    }
 
+    private fun setupItemDecoration() {
         val spacingInPixels = resources.getDimensionPixelSize(R.dimen.creature_card_grid_layout_margin)
         listItemDecoration = SpacingItemDecoration(1, spacingInPixels)
         gridItemDecoration = SpacingItemDecoration(2, spacingInPixels)
 
         creatureRecyclerView.addItemDecoration(gridItemDecoration)
+    }
 
-        //滚动监听
+    private fun setupScrollListener() {
         creatureRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -175,7 +196,6 @@ class AllFragment : Fragment() {
                 }
             }
         })
-
     }
 
     private fun updateRecyclerView(spanCount: Int, addItemDecoration: RecyclerView.ItemDecoration, removeItemDecoration: RecyclerView.ItemDecoration) {
@@ -195,4 +215,10 @@ class AllFragment : Fragment() {
     private fun showGridView() {
         layoutManager.spanCount = 2
     }
+
+    private fun setupItemTouchHelper() {
+        itemTouchHelper = ItemTouchHelper(GridItemTouchHelperCallback(adpater))
+        itemTouchHelper.attachToRecyclerView(creatureRecyclerView)
+    }
+
 }
