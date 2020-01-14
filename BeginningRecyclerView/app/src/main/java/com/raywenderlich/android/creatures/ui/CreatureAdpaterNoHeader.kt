@@ -128,6 +128,13 @@ class CreatureAdpaterNoHeader(private val creatures: MutableList<Creature>, priv
         return true
     }
 
+    //swipe删除
+    override fun onItemDismiss(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        Favorites.removeFavorite(creatures[position], viewHolder.itemView.context)
+        creatures.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
     enum class ViewType {
         HEADER, CREATURE
     }

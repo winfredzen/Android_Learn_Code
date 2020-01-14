@@ -7,8 +7,10 @@ class ItemTouchHelperCallback(private val listener: ItemTouchHelperListener): It
 
     override fun isLongPressDragEnabled() = false
 
+    override fun isItemViewSwipeEnabled() = true //允许滑动删除
+
     override fun getMovementFlags(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?): Int {
-        return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
+        return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.START or ItemTouchHelper.END)
     }
 
     //drag的时候，调用此方法
@@ -16,8 +18,8 @@ class ItemTouchHelperCallback(private val listener: ItemTouchHelperListener): It
         return listener.onItemMove(recyclerView, viewHolder.adapterPosition, target.adapterPosition)
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
-
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        listener.onItemDismiss(viewHolder, viewHolder.adapterPosition)
     }
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {

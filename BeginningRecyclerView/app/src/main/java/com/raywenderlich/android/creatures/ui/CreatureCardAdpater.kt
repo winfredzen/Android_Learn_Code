@@ -130,6 +130,10 @@ class CreatureCardAdpater(private val creatures: MutableList<Creature>) : Recycl
         return true
     }
 
+    override fun onItemDismiss(viewHolder: RecyclerView.ViewHolder, position: Int) {
+
+    }
+
     //滚动的方向
     enum class ScrollDirection {
         UP, DOWN
