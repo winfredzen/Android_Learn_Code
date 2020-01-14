@@ -29,6 +29,7 @@ public class BeatBoxFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true); //保留fragment
 
         mBeatBox = new BeatBox(getActivity());
     }
@@ -46,13 +47,18 @@ public class BeatBoxFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBeatBox.release();
+    }
 
     private class SoundHoler extends RecyclerView.ViewHolder {
 
         private ListItemSoundBinding mBinding;
 
         private SoundHoler(ListItemSoundBinding binding) {
-            super(binding.getRoot());
+            super(binding.getRoot());//返回的view
             mBinding = binding;
             mBinding.setViewModel(new SoundViewModel(mBeatBox));
         }
