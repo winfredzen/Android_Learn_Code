@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Collections;
@@ -71,11 +73,13 @@ public class NerdLauncherFragment extends Fragment {
 
         private ResolveInfo mResolveInfo;
         private TextView mNameTextView;
+        private ImageView mImageView;
 
         public ActivityHolder(@NonNull View itemView) {
             super(itemView);
-            mNameTextView = (TextView) itemView;
-            mNameTextView.setOnClickListener(this);//添加点击监听
+            mNameTextView = (TextView) itemView.findViewById(R.id.textView);
+            mImageView = (ImageView) itemView.findViewById(R.id.imageView);
+            itemView.setOnClickListener(this);//添加点击监听
         }
 
         public void bindActivity(ResolveInfo resolveInfo) {
@@ -83,6 +87,9 @@ public class NerdLauncherFragment extends Fragment {
             PackageManager pm = getActivity().getPackageManager();
             String appName = mResolveInfo.loadLabel(pm).toString();
             mNameTextView.setText(appName);
+
+            Drawable drawable = mResolveInfo.loadIcon(pm);
+            mImageView.setImageDrawable(drawable);
         }
 
         /*点击监听*/
@@ -113,7 +120,8 @@ public class NerdLauncherFragment extends Fragment {
         @Override
         public ActivityHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater.inflate(android.R.layout.simple_list_item_1, viewGroup, false);
+//            View view = layoutInflater.inflate(android.R.layout.simple_list_item_1, viewGroup, false);
+            View view = layoutInflater.inflate(R.layout.list_item_image_text, viewGroup, false);
             return new ActivityHolder(view);
         }
 
