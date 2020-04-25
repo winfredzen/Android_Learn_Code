@@ -85,10 +85,10 @@ public class NerdLauncherFragment extends Fragment {
         public void bindActivity(ResolveInfo resolveInfo) {
             mResolveInfo = resolveInfo;
             PackageManager pm = getActivity().getPackageManager();
-            String appName = mResolveInfo.loadLabel(pm).toString();
+            String appName = mResolveInfo.loadLabel(pm).toString();//名称
             mNameTextView.setText(appName);
 
-            Drawable drawable = mResolveInfo.loadIcon(pm);
+            Drawable drawable = mResolveInfo.loadIcon(pm);//图标
             mImageView.setImageDrawable(drawable);
         }
 
