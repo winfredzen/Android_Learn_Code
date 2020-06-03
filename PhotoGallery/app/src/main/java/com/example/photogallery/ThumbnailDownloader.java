@@ -68,7 +68,7 @@ public class ThumbnailDownloader<T> extends HandlerThread {
             mRequestMap.remove(target);
         } else {
             mRequestMap.put(target, url);
-            mRequestHandler.obtainMessage(MESSAGE_DOWNLOAD, target).sendToTarget();
+            mRequestHandler.obtainMessage(MESSAGE_DOWNLOAD, target).sendToTarget();//发送到消息队列
         }
 
     }
